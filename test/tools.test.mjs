@@ -144,10 +144,11 @@ test('the key is accepted and a search still returns the documented deal fields'
     });
     assert.ok(!raw.includes('401 Unauthorized'), 'HasData rejected the key');
 
-    // Upstream answers 400 "Invalid api response" on roughly half the calls, measured over
-    // repeated runs on 2026-10-05. That is an upstream fault rather than a contract change,
-    // and a contract change would surface as a wrong shape below instead. Skip rather than
-    // fail, so this suite stays a signal about the contract and not about their uptime.
+    // Upstream answers 400 "Invalid api response" on a minority of calls: 25 of 176 measured
+    // on 2026-10-05, in bursts rather than evenly. That is an upstream fault rather than a
+    // contract change, and a contract change would surface as a wrong shape below instead.
+    // Skip rather than fail, so this suite stays a signal about the contract and not about
+    // their uptime.
     if (raw.includes('Invalid api response')) return t.skip('upstream returned 400 Invalid api response');
     assert.ok(!raw.includes('"isError":true'), `the tool call failed: ${raw.slice(0, 300)}`);
 
@@ -164,4 +165,18 @@ test('the key is accepted and a search still returns the documented deal fields'
     for (const field of ['outboundDate', 'price', 'typicalPrice', 'durationMinutes', 'stops', 'departureAirport', 'arrivalAirport', 'bookingLink']) {
         assert.ok(field in first, `deals no longer carry ${field}`);
     }
+});
+
+test('a filter without arrivalId is refused rather than ignored', live, async () => {
+    // The README tells readers the call is rejected before it costs anything. If upstream ever
+    // switches to accepting the filter and dropping it, every agent following that README would
+    // start quoting fares that ignore the constraint it was asked for, with nothing in the
+    // payload to show it. So assert the refusal, not just the absence of a crash.
+    const { raw } = await rpc('tools/call', {
+        name: 'hasdata_google_travel_flights_deals_getGoogleFlightsDeals',
+        arguments: { q: 'cherry blossom in Japan', departureId: 'LAX', stops: 'nonStop' },
+    });
+    assert.ok(raw.includes('"isError":true'), `a filter without arrivalId was accepted: ${raw.slice(0, 300)}`);
+    assert.ok(raw.includes('422'), `expected a 422 from validation, got: ${raw.slice(0, 300)}`);
+    assert.ok(raw.includes('arrivalId'), `the error does not name arrivalId: ${raw.slice(0, 300)}`);
 });

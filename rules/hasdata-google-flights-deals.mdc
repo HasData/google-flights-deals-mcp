@@ -11,17 +11,17 @@ This is the inspiration end of flight search. The user says "cherry blossom in J
 
 ## Every filter needs `arrivalId`
 
-`type`, `travelClass`, `outboundDate`, `returnDate`, `travelDuration`, `tripLength`, `stops`, `maxDuration`, `maxPrice`, `includeAirlines` and `excludeAirlines` all require a pinned destination. Sending any of them without `arrivalId` does not fail. The call succeeds, gets billed, and quietly ignores what was asked.
+`type`, `travelClass`, `outboundDate`, `returnDate`, `travelDuration`, `tripLength`, `stops`, `maxDuration`, `maxPrice`, `includeAirlines` and `excludeAirlines` all require a pinned destination. Sending any of them without `arrivalId` returns 422 with `rule: "requiredIfExists"` and costs nothing, so the mistake surfaces immediately rather than hiding in a plausible-looking answer.
 
-So a request for direct flights under a price cap while letting Google choose the destination is asking for two incompatible things. Pin a destination or drop the filters, and say which you did.
+So a request for direct flights under a price cap while letting Google choose the destination is asking for two incompatible things, and the API refuses it rather than guessing. Pin a destination or drop the filters, and say which you did.
 
 Three of them also exclude each other. `returnDate`, `travelDuration` and `tripLength` are three ways to say how long the trip is, and only one can be set. `includeAirlines` and `excludeAirlines` are the same way round.
 
 ## Fields that are present on some deals and not others
 
-`discountPercent` arrives only when Google considers the fare discounted. In a measured search of five deals it was on one. `typicalPrice` was on all five, so the comparison can be computed when the field is missing. An absent key is not a zero discount.
+`discountPercent` arrives only when Google considers the fare discounted. Across 351 measured deals it was on 109, and where it was absent the fare still sat 4% to 15% under `typicalPrice`. `typicalPrice` was on every deal, so compute the comparison when the field is missing. An absent key is not a zero discount.
 
-`airline` and `airlineCode` disappear together when the itinerary is flown by more than one carrier, and `multipleAirlines` is true instead. Read that flag before naming a carrier, and say "several airlines" rather than reporting a blank.
+`airline` and `airlineCode` disappear together when the itinerary is flown by more than one carrier, and `multipleAirlines` is true instead. The split is exact: in 351 measured deals all 82 that set the flag omitted both fields and all 269 that did not carried both. Read the flag before naming a carrier, and say "several airlines" rather than reporting a blank.
 
 ## Read the dates back before quoting a price
 

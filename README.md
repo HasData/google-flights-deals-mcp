@@ -158,7 +158,7 @@ One tool, 15 credits per successful call.
 | `maxPrice` | number | | Ceiling in the currency of the request |
 | `includeAirlines` / `excludeAirlines` | string | | One or the other, never both |
 
-The filters are the thing to get right. **All of them require `arrivalId`.** A prompt that asks for direct flights under a price cap while letting Google pick the destination is asking for two things that cannot be combined, and the honest move is to pin a destination or drop the filters rather than to send them and have them ignored.
+The filters are the thing to get right. **All of them require `arrivalId`.** A prompt that asks for direct flights under a price cap while letting Google pick the destination is asking for two things that cannot be combined, and the API says so with a 422 naming the offending pair. Pin a destination or drop the filters.
 
 `searchInformation` reports what Google made of the query: the `departure` airport in full with its city and coordinates, the `dateRange` it settled on, the `priceRange` it found and the `airlines` involved.
 
@@ -195,15 +195,15 @@ The filters are the thing to get right. **All of them require `arrivalId`.** A p
 
 Your client almost never sees an HTTP error code from a tool call. The MCP layer answers 200 and puts the failure inside the result, with `isError` set to `true` and the reason as text.
 
-**`discountPercent` is the exception, not the rule.** In a measured search returning five deals, only one carried it. `typicalPrice` was on all five, so a discount can be computed against it when the field is absent, but do not report "no discount" because the key is missing.
+**`discountPercent` is the exception, not the rule.** Across 351 deals measured on 2026-10-05 it was present on 109 of them. Where it appears it matches the gap between `price` and `typicalPrice` to within a rounding step, and where it is absent that gap ran from 4% to 15%, so Google appears to publish the field only past a threshold of its own. `typicalPrice` was on every deal, so compute the comparison yourself rather than reporting "no discount" because the key is missing.
 
-**`airline` and `airlineCode` go missing together.** Four of those five deals named an airline. The fifth set `multipleAirlines` to true instead, because the itinerary is flown by more than one carrier. Read `multipleAirlines` before reporting a carrier, and say "several airlines" rather than leaving the field blank.
+**`airline` and `airlineCode` go missing together.** In that same sample 269 deals named a carrier and 82 did not, and the split is exactly the `multipleAirlines` flag: every deal that set it to true omitted both fields, every deal that did not carried both. Read the flag before reporting a carrier, and say "several airlines" rather than leaving the field blank.
 
-**A filter without `arrivalId` is not an error.** It comes back as a successful, billed call that simply did not apply what was asked. Nothing in the payload marks the difference, so check the combination before sending rather than after.
+**A filter without `arrivalId` is rejected before it runs.** The API answers 422 with `rule: "requiredIfExists"` naming both `arrivalId` and the filter that triggered it, and nothing is billed. All eleven filters behave this way, so the failure is loud and cheap rather than silent.
 
 **Dates are what Google chose unless you pinned them.** `searchInformation.dateRange` is the range it searched, which can be months away from today. Quote it when presenting prices, because a fare for next March is not a fare for next month.
 
-Each successful call spends credits from the connected account. A call that fails validation is not billed.
+Each successful call spends credits from the connected account. Neither a 422 from validation nor a 400 from upstream is billed, measured by reading the balance either side of a call.
 
 ## Pricing, free tier and limits
 
