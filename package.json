@@ -1,0 +1,40 @@
+{
+  "name": "@hasdata/google-flights-deals-mcp",
+  "mcpName": "com.hasdata/google-flights-deals",
+  "version": "1.0.0",
+  "description": "MCP server for Google Flights Deals through HasData's hosted API: turn a plain-language trip description into dated flight deals with prices, discounts, airlines and booking links. 1,000 free credits every month.",
+  "type": "module",
+  "bin": {
+    "hasdata-google-flights-deals-mcp": "index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "mcp-remote": "^0.1.43"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HasData/google-flights-deals-mcp.git"
+  },
+  "homepage": "https://hasdata.com/apis/google-flights-api",
+  "keywords": [
+    "mcp",
+    "google-flights",
+    "flight-deals",
+    "travel",
+    "fares",
+    "model-context-protocol",
+    "hasdata",
+    "scraper"
+  ]
+}

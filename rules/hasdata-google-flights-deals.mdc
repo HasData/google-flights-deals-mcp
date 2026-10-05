@@ -1,0 +1,38 @@
+---
+description: How to turn a plain-language trip description into dated flight deals through the HasData MCP server
+alwaysApply: false
+---
+
+# Google Flights Deals through HasData
+
+One tool, `hasdata_google_travel_flights_deals_getGoogleFlightsDeals`. It needs `q`, a free-text trip description, and `departureId`, the origin as a three-letter uppercase IATA code. Everything else is optional, and most of it comes with a condition.
+
+This is the inspiration end of flight search. The user says "cherry blossom in Japan" and Google picks both the destinations and the dates. For a trip somebody has already decided on, the plain Google Flights tool is the right call instead.
+
+## Every filter needs `arrivalId`
+
+`type`, `travelClass`, `outboundDate`, `returnDate`, `travelDuration`, `tripLength`, `stops`, `maxDuration`, `maxPrice`, `includeAirlines` and `excludeAirlines` all require a pinned destination. Sending any of them without `arrivalId` does not fail. The call succeeds, gets billed, and quietly ignores what was asked.
+
+So a request for direct flights under a price cap while letting Google choose the destination is asking for two incompatible things. Pin a destination or drop the filters, and say which you did.
+
+Three of them also exclude each other. `returnDate`, `travelDuration` and `tripLength` are three ways to say how long the trip is, and only one can be set. `includeAirlines` and `excludeAirlines` are the same way round.
+
+## Fields that are present on some deals and not others
+
+`discountPercent` arrives only when Google considers the fare discounted. In a measured search of five deals it was on one. `typicalPrice` was on all five, so the comparison can be computed when the field is missing. An absent key is not a zero discount.
+
+`airline` and `airlineCode` disappear together when the itinerary is flown by more than one carrier, and `multipleAirlines` is true instead. Read that flag before naming a carrier, and say "several airlines" rather than reporting a blank.
+
+## Read the dates back before quoting a price
+
+`searchInformation.dateRange` is the window Google actually searched, and for a seasonal query it can be months out. A fare found for next March is not a fare for next month, so quote the range alongside the price rather than presenting the number alone.
+
+`searchInformation` also reports the `departure` airport in full, the `priceRange` found and the `airlines` involved, which is the cheapest way to sanity-check that the query was read the way the user meant.
+
+## Reading a deal
+
+A deal carries `outboundDate` and `returnDate`, `price` and `typicalPrice` as `{ value, currency }` pairs, `durationMinutes`, `tripLengthDays`, `stops`, the `departureAirport` and `arrivalAirport`, a `destination` block with the city, country and a short highlight, and `bookingLink`, a direct Google Flights link.
+
+`durationMinutes` is per flight rather than for the whole trip. Convert it before showing it to a reader, because 1320 means twenty-two hours.
+
+Each successful call spends credits from the connected account, and one origin per call means comparing two cities costs two calls.

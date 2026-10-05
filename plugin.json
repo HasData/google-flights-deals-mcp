@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "hasdata-google-flights-deals-mcp",
+  "version": "1.0.0",
+  "description": "Google Flights Deals MCP server for Cursor. Turn a plain-language trip description such as \"cherry blossom in Japan\" into dated flight deals from one origin, with prices, the typical price beside them, airlines, stops and booking links, as structured JSON. Remote MCP server hosted by HasData, connects over streamable HTTP with your HasData API key.",
+  "author": {
+    "name": "HasData",
+    "url": "https://hasdata.com"
+  },
+  "homepage": "https://hasdata.com/apis/google-flights-api",
+  "repository": "https://github.com/HasData/google-flights-deals-mcp",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "google-flights",
+    "flight-deals",
+    "travel",
+    "fares",
+    "model-context-protocol",
+    "hasdata",
+    "scraper"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.hasdata/google-flights-deals",
+  "title": "HasData Google Flights Deals",
+  "description": "Turn a plain-language trip description into dated flight deals with prices, discounts, airlines and booking links, as JSON.",
+  "version": "1.0.0",
+  "websiteUrl": "https://hasdata.com/apis/google-flights-api",
+  "repository": {
+    "url": "https://github.com/HasData/google-flights-deals-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.hasdata.com/mcp?apis=google_travel_flights_deals",
+      "headers": [
+        {
+          "name": "x-api-key",
+          "description": "HasData API key, created at app.hasdata.com. 1,000 free credits every month, no card.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hasdata/google-flights-deals-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "HASDATA_API_KEY",
+          "description": "HasData API key, created at app.hasdata.com. 1,000 free credits every month, no card.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    },
+    {
+      "registryType": "pypi",
+      "identifier": "hasdata-google-flights-deals-mcp",
+      "version": "1.0.0",
+      "runtimeHint": "uvx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "HASDATA_API_KEY",
+          "description": "HasData API key, created at app.hasdata.com. 1,000 free credits every month, no card.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
