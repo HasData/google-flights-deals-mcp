@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HasData/google-flights-deals-mcp.git"
+    "url": "git+https://github.com/HasData/google-flights-deals-mcp.git"
   },
   "homepage": "https://hasdata.com/apis/google-flights-api",
   "keywords": [
