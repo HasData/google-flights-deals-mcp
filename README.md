@@ -14,6 +14,7 @@ https://mcp.hasdata.com/mcp?apis=google_travel_flights_deals
 [![tool contract](https://github.com/HasData/google-flights-deals-mcp/actions/workflows/contract.yml/badge.svg)](https://github.com/HasData/google-flights-deals-mcp/actions/workflows/contract.yml)
 [![MCP](https://img.shields.io/badge/MCP-remote%20%7C%20streamable%20HTTP-6366f1?style=flat-square)](https://modelcontextprotocol.io)
 [![Tools](https://img.shields.io/badge/tools-1-10b981?style=flat-square)](#tools)
+- [Prompts and resources](#prompts-and-resources)
 [![npm](https://img.shields.io/npm/v/@hasdata/google-flights-deals-mcp?style=flat-square&logo=npm&label=npm&color=cb3837)](https://www.npmjs.com/package/@hasdata/google-flights-deals-mcp)
 [![PyPI](https://img.shields.io/pypi/v/hasdata-google-flights-deals-mcp?style=flat-square&logo=pypi&logoColor=white&label=PyPI&color=3775a9)](https://pypi.org/project/hasdata-google-flights-deals-mcp/)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
@@ -190,6 +191,22 @@ The filters are the thing to get right. **All of them require `arrivalId`.** A p
   ]
 }
 ```
+
+## Prompts and resources
+
+The server exposes 7 resources, one per parameter whose accepted values are a fixed list. Reading one is cheaper than learning the vocabulary from a rejected call, and it costs no credits. Each URI is `hasdata://google_travel_flights_deals/<parameter>`.
+
+| Parameter | Values | What it selects |
+| --- | ---: | --- |
+| `type` | 4 | Flight type. Requires `arrivalId`. - `1` / `roundTrip` — round trip (default) - `2` / `oneWay` — one way A one-way deal carries no `returnDate` and no `tripLengthDays`. |
+| `travelClass` | 8 | Travel class. Requires `arrivalId`. - `1` / `economy` — economy (default) - `2` / `premiumEconomy` — premium economy - `3` / `business` — business - `4` / `first` — first Fares climb steeply: on LAX-NRT the same search ran $730 in economy against $2882 in business. |
+| `travelDuration` | 6 | Preset trip length. Requires `arrivalId`. Cannot be combined with `returnDate` or `tripLength`. - `1` / `week` — about a week (6-8 days) - `2` / `weekend` — a weekend (2-3 days) - `3` / `twoWeeks` — about two weeks (13-15 days) Pairs with `outboundDate` to limit the departure period. Ignored when `type` is `oneWay`. |
+| `stops` | 6 | Maximum number of stops. Requires `arrivalId`. Omitted, any number is allowed. - `1` / `nonStop` — direct flights only - `2` / `oneStopOrFewer` — at most one connection - `3` / `twoStopsOrFewer` — at most two connections A route with nothing at that depth returns an empty `flightDeals` array, not an error — `nonStop` on a route without a direct flight is a valid, empty answer. |
+| `gl` | 245 | The two-letter country code for the country you want to limit the search to. |
+| `hl` | 159 | The two-letter language code for the language you want to use for the search. |
+| `currency` | 71 | Parameter defines the currency of the returned prices |
+
+The list is served without an API key, so a client can read it before a user has signed up.
 
 ## Errors and failure paths
 
